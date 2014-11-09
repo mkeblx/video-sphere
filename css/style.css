@@ -1,0 +1,37 @@
+html {
+  box-sizing: border-box;
+}
+*, *:before, *:after {
+  box-sizing: inherit;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #fff;
+  color: #000;
+  font-family: sans-serif;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  position: fixed;
+}
+
+#vr-button {
+	position: fixed;
+	top: 20px;
+	left: 20px;
+	padding: 8px;
+	color: #fff;
+	background-color: #555;
+}
+
+#vr-button:hover {
+	cursor: pointer;
+	background-color: rgb(18, 36, 70);
+}
+
+#vr-button.error {
+	pointer-events: none;
+	background-color: red;
+}
