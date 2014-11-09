@@ -11,6 +11,7 @@ var vrControls;
 
 var objects = [];
 
+var video;
 
 var has = {
 	WebVR: !!navigator.getVRDevices
@@ -67,7 +68,7 @@ function setupVideo() {
 	var geo = new THREE.SphereGeometry( 500, 60, 40 );
 	geo.applyMatrix( new THREE.Matrix4().makeScale( -1, 1, 1 ) );
 
-	var video = document.createElement('video');
+	video = document.createElement('video');
 	video.width = 640;
 	video.height = 360;
 	video.autoplay = true;
@@ -133,8 +134,49 @@ function onWindowResize() {
 	camera.aspect = window.innerWidth / window.innerHeight;
 	camera.updateProjectionMatrix();
 
-	//renderer.setSize(window.innerWidth, window.innerHeight);
+	renderer.setSize(window.innerWidth, window.innerHeight);
 }
+
+// player controls
+var restart = function() {
+	if (!video.paused) {
+		video.load();
+		video.play();
+	}
+};
+
+var getPc = function() {
+	if (video.readyState != 4)
+		return 0;
+
+	var dur = video.duration;
+	var cur = video.currentTime;
+	return cur/dur;
+};
+
+var seekBy = function(pc) {
+	var curPc = getPc();
+	seekTo(curPc*100 + pc);
+};
+
+var seekTo = function(pc) {
+	var dur = video.duration;
+	var cur = video.currentTime;
+
+	pc /= 100;
+	var t = pc * dur;
+	t = Math.min(Math.max(0, t), dur);
+	video.currentTime = t;
+};
+
+var togglePlay = function() {
+	video.paused ? video.play() : video.pause();  
+};
+
+var toggleMute = function(val) {
+	video.muted = !video.muted;
+};
+
 
 function keyPressed (e) {
 
@@ -154,7 +196,36 @@ function keyPressed (e) {
 		case 221: // ]
 			vrEffect.setRenderScale(vrEffect.getRenderScale()*1.1);
 			break;
-	}
+
+		case 37: // left
+			seekBy(-5);
+			break;
+		case 39: // right
+			seekBy(5);
+			break;
+		case 48: // #s
+		case 49:
+		case 50:
+		case 51:
+		case 52:
+		case 53:
+		case 54:
+		case 55:
+		case 56:
+		case 57:
+			seekTo((e.keyCode-49+1)*10);
+			break;
+		case 77: // m
+			toggleMute();
+			break;
+		case 73: // i - restart from beginning
+			restart();
+			break;
+		case 80: // p
+		case 32: // space
+			togglePlay();
+			break;
+	}  
 
 }
 
