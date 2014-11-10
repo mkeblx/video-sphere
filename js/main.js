@@ -11,7 +11,7 @@ var vrControls;
 
 var objects = [];
 
-var video;
+var videoSphere, video;
 
 var has = {
 	WebVR: !!navigator.getVRDevices
@@ -60,18 +60,28 @@ function setupScene() {
 
 	//scene.add(mesh);
 
-	setupVideo();
+	setupVideoSphere();
 }
 
-function setupVideo() {
+function setupVideoSphere() {
+	var opts = {
+		video: {
+			src: 'videos/reef_1920_4.webm',
+			width: 640,
+			height: 360
+		}
+	};
+
+	videoSphere = new N.VideoSphere(opts);
+
+	scene.add( videoSphere.getContainer() );
+
+	return;
 
 	var geo = new THREE.SphereGeometry( 500, 60, 40 );
 	geo.applyMatrix( new THREE.Matrix4().makeScale( -1, 1, 1 ) );
 
 	video = document.createElement('video');
-	video.width = 640;
-	video.height = 360;
-	video.autoplay = true;
 	video.loop = true; 
 	video.src = 'videos/reef_1920_4.webm';
 
@@ -137,50 +147,8 @@ function onWindowResize() {
 	renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
-// player controls
-var restart = function() {
-	if (!video.paused) {
-		video.load();
-		video.play();
-	}
-};
-
-var getPc = function() {
-	if (video.readyState != 4)
-		return 0;
-
-	var dur = video.duration;
-	var cur = video.currentTime;
-	return cur/dur;
-};
-
-var seekBy = function(pc) {
-	var curPc = getPc();
-	seekTo(curPc*100 + pc);
-};
-
-var seekTo = function(pc) {
-	var dur = video.duration;
-	var cur = video.currentTime;
-
-	pc /= 100;
-	var t = pc * dur;
-	t = Math.min(Math.max(0, t), dur);
-	video.currentTime = t;
-};
-
-var togglePlay = function() {
-	video.paused ? video.play() : video.pause();  
-};
-
-var toggleMute = function(val) {
-	video.muted = !video.muted;
-};
-
 
 function keyPressed (e) {
-
-	// TODO: add player controls
 
 	console.log(e.keyCode);
 	switch (e.keyCode) {
@@ -198,10 +166,10 @@ function keyPressed (e) {
 			break;
 
 		case 37: // left
-			seekBy(-5);
+			videoSphere.seekBy(-5);
 			break;
 		case 39: // right
-			seekBy(5);
+			videoSphere.seekBy(5);
 			break;
 		case 48: // #s
 		case 49:
@@ -213,17 +181,17 @@ function keyPressed (e) {
 		case 55:
 		case 56:
 		case 57:
-			seekTo((e.keyCode-49+1)*10);
+			videoSphere.seekTo((e.keyCode-49+1)*10);
 			break;
 		case 77: // m
-			toggleMute();
+			videoSphere.toggleMute();
 			break;
-		case 73: // i - restart from beginning
-			restart();
+		case 73: // i
+			videoSphere.restart();
 			break;
 		case 80: // p
 		case 32: // space
-			togglePlay();
+			videoSphere.togglePlay();
 			break;
 	}  
 
