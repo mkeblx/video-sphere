@@ -64,8 +64,8 @@ N.VideoSphere.prototype.getPc = function() {
 };
 
 N.VideoSphere.prototype.seekBy = function(pc) {
-	var curPc = getPc();
-	seekTo(curPc*100 + pc);
+	var curPc = this.getPc();
+	this.seekTo(curPc*100 + pc);
 };
 
 N.VideoSphere.prototype.seekTo = function(pc) {
@@ -88,6 +88,38 @@ N.VideoSphere.prototype.toggleMute = function(val) {
 	this.video.muted = !this.video.muted;
 };
 
+N.VideoSphere.prototype.fire = function(event, e) {
+	switch (e.keyCode) {
+		case 37: // left
+			this.seekBy(-5);
+			break;
+		case 39: // right
+			this.seekBy(5);
+			break;
+		case 48: // #s
+		case 49:
+		case 50:
+		case 51:
+		case 52:
+		case 53:
+		case 54:
+		case 55:
+		case 56:
+		case 57:
+			this.seekTo((e.keyCode-49+1)*10);
+			break;
+		case 77: // m
+			this.toggleMute();
+			break;
+		case 73: // i
+			this.restart();
+			break;
+		case 80: // p
+		case 32: // space
+			this.togglePlay();
+			break;
+	}
+};
 
 N.VideoSphere.prototype.update = function(dt) {
 
