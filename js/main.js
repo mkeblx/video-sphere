@@ -10,10 +10,8 @@ var vrEffect;
 var vrControls;
 
 var objects = [];
+var selectedObj;
 
-var videoSphere, video;
-
-var selectedVideoSphere;
 
 var has = {
 	WebVR: !!navigator.getVRDevices
@@ -45,23 +43,29 @@ function setupScene() {
 	scene = new THREE.Scene();
 	scene.fog = new THREE.Fog(0xffffff, 0, 1500);
 
-	setupVideoSphere();
+	setupVideoSpheres();
 }
 
-function setupVideoSphere() {
-	var opts = {
-		video: {
-			src: 'videos/reef_1920_4.webm',
-			width: 640,
-			height: 360
+function setupVideoSpheres() {
+	var spheres = [
+		{
+			video: {
+				src: 'videos/reef_1920_4.webm',
+				width: 640,
+				height: 360,
+				size: 500
+			}
 		}
-	};
+	];
 
-	videoSphere = new N.VideoSphere(opts);
+	for (var i = 0; i < spheres.length; i++) {
+		var videoSphere = new N.VideoSphere(spheres[0]);
+		
+		objects.push(videoSphere);
+		scene.add(videoSphere.getContainer());
+	}
 
-	selectedVideoSphere = videoSphere;
-
-	scene.add(videoSphere.getContainer());
+	selectedObj = objects[0];
 }
 
 function setupLights() {
@@ -125,7 +129,7 @@ function keyPressed(e) {
 			break;
 	}
 
-	selectedVideoSphere.fire('kbd', e);
+	selectedObj.fire('kbd', e);
 }
 
 

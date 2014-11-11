@@ -11,7 +11,7 @@ N.VideoSphere.prototype.init = function(options) {
 
 	var mesh = new THREE.Mesh();
 
-	var geo = new THREE.SphereGeometry(500, 60, 40);
+	var geo = new THREE.SphereGeometry(options.size, 60, 40);
 	geo.applyMatrix(new THREE.Matrix4().makeScale( -1, 1, 1 ));
 
 	var video = document.createElement('video');
