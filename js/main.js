@@ -10,7 +10,8 @@ var vrEffect;
 var vrControls;
 
 var objects = [];
-var selectedObj;
+var meshes = [];
+var selectedObj, selId = 0;
 
 
 var has = {
@@ -47,25 +48,28 @@ function setupScene() {
 }
 
 function setupVideoSpheres() {
-	var spheres = [
-		{
-			video: {
-				src: 'videos/reef_1920_4.webm',
-				width: 640,
-				height: 360,
-				size: 500
-			}
-		}
-	];
+	var spheresGroup = new THREE.Group();
+
+	spheresGroup.position.set(0,0,-100);
+
+	var spheres = DATA;
 
 	for (var i = 0; i < spheres.length; i++) {
-		var videoSphere = new N.VideoSphere(spheres[0]);
+		var videoSphere = new N.VideoSphere(spheres[i]);
 		
+		var c = videoSphere.getContainer();
+
 		objects.push(videoSphere);
-		scene.add(videoSphere.getContainer());
+		meshes.push(c);
+
+		c.position.fromArray(spheres[i].pos);
+
+		spheresGroup.add(c);
 	}
 
-	selectedObj = objects[0];
+	scene.add(spheresGroup);
+
+	selectedObj = objects[selId];
 }
 
 function setupLights() {
@@ -127,11 +131,44 @@ function keyPressed(e) {
 		case 221: // ]
 			vrEffect.setRenderScale(vrEffect.getRenderScale()*1.1);
 			break;
+
+		case 9: // tab
+			cycleSelection();
+			e.preventDefault();
+			break;
 	}
 
 	selectedObj.fire('kbd', e);
 }
 
+function cycleSelection() {
+	selId++;
+	if (selId > objects.length-1) selId = 0;
+	selectedObj = objects[selId];
+}
+
+function handleSelection(pos, vrState) {
+	var rotation = new THREE.Quaternion();
+	rotation.fromArray(vrState.hmd.rotation);
+
+	var dir = new THREE.Vector3(0,0,-1);
+	dir = dir.applyQuaternion(rotation);
+
+	var _pos = new THREE.Vector3();
+	_pos = _pos.fromArray(pos);
+
+	var ray = new THREE.Raycaster(_pos, dir);
+
+	var intersects = ray.intersectObjects(meshes, true);
+	if (intersects.length) {
+		var io = intersects[0];
+
+		if (io.object.parent.sphere) {
+			var sph = io.object.parent.sphere;
+			selectedObj = sph;
+		}
+	}
+}
 
 function animate(t) {
 	requestAnimationFrame(animate);
@@ -150,6 +187,8 @@ function animate(t) {
 		pos[2] *= s;
 
 		camera.position.fromArray(pos);
+
+		handleSelection(pos, vrState);
 	}
 
 	vrControls.update();

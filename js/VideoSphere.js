@@ -15,8 +15,6 @@ N.VideoSphere.prototype.init = function(options) {
 	geo.applyMatrix(new THREE.Matrix4().makeScale( -1, 1, 1 ));
 
 	var video = document.createElement('video');
-	video.width = options.video.width;
-	video.height = options.video.height;
 	video.autoplay = false;
 	video.src = options.video.src;
 	this.video = video;
@@ -30,6 +28,9 @@ N.VideoSphere.prototype.init = function(options) {
 	var mesh = new THREE.Mesh(geo, mat);
 
 	container.add(mesh);
+
+	mesh.sphere = this;
+	container.sphere = this;
 
 	this.mesh = mesh;
 	this.container = container;
